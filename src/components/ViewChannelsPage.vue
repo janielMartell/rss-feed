@@ -57,15 +57,44 @@
     data() {
       return {
         toggle: false,
+        CORS_PROXY: "https://cors-anywhere.herokuapp.com/",
+        feedUrl: "",
         error: false,
         highlight: false,
         errorMessage: "",
+        feeds: []
       };
     },
     methods: {
       toggleModal: function () {
         this.toggle = !this.toggle;
         this.resetModal();
+      },
+
+      validateUrl: function () {
+        let url = this.feedUrl.trim();
+        this.resetModal();
+
+        if (url) this.feedUrl = url;
+        else {
+          this.errorMessage = "Feed URL is required";
+          this.error = true;
+          this.highlight = true;
+        }
+
+        if (this.feeds.filter(feed => feed.feedUrl === this.feedUrl).length == 0) {
+          this.fetchFeed();
+          this.feedUrl = "";
+        } else {
+          this.errorMessage = "Feed has already been added";
+          this.error = true;
+          this.highlight = true;
+        }
+      },
+
+      resetModal: function () {
+        this.highlight = false;
+        this.error = false;
       }
     }
   };
