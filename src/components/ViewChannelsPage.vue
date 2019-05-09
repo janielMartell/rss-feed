@@ -313,7 +313,23 @@
         </div>
         <div v-else>
           <h1 class="text-2xl mt-10 mb-5 text text-grey-darkest">Articles</h1>
-          <ol class="list-reset">
+          <div v-if="spinner">
+            <div class="sk-fading-circle">
+              <div class="sk-circle1 sk-circle"></div>
+              <div class="sk-circle2 sk-circle"></div>
+              <div class="sk-circle3 sk-circle"></div>
+              <div class="sk-circle4 sk-circle"></div>
+              <div class="sk-circle5 sk-circle"></div>
+              <div class="sk-circle6 sk-circle"></div>
+              <div class="sk-circle7 sk-circle"></div>
+              <div class="sk-circle8 sk-circle"></div>
+              <div class="sk-circle9 sk-circle"></div>
+              <div class="sk-circle10 sk-circle"></div>
+              <div class="sk-circle11 sk-circle"></div>
+              <div class="sk-circle12 sk-circle"></div>
+            </div>
+          </div>
+          <ol class="list-reset" v-else>
             <li v-for="item in items" :key="item.key" class="mb-5">
               <a :href="item.link" class="no-underline block bg-white p-4 shadow rounded max-w-sm" target="_blank">
                 <h4 class="mb-2 text-black">{{ item.title }}</h4>
@@ -340,7 +356,7 @@
               Add a RSS feed URL
               <span class="text-red">*</span>
             </label>
-            <input id="feed-url" name="feed-url" type="text" v-model="feedUrl" autocomplete="off" autofocus
+            <input id="feed-url" name="feed-url" type="text" v-model="feedUrl" autocomplete="off" autofocus @keyup.enter="validateUrl"
               class="rounded px-3 py-1 leading-loose bg-grey-lighter w-full text-grey-darker text-lg"
               :class="highlight ? 'border border-red-lighter text-red-dark' : ''" placeholder="example-url.com/rss">
           </div>
@@ -372,6 +388,7 @@
 <script>
   import Parser from "rss-parser";
   import moment from "moment";
+import { setTimeout } from 'timers';
 
   export default {
     data() {
@@ -382,7 +399,8 @@
         error: false,
         highlight: false,
         errorMessage: "",
-        feeds: []
+        feeds: [],
+        spinner: false
       };
     },
     methods: {
@@ -418,6 +436,7 @@
         parser
           .parseURL(this.CORS_PROXY + this.feedUrl)
           .then(feed => {
+            this.toggleSpinner()
             this.addFeed(feed);
             this.toggleModal(feed);
           })
@@ -442,6 +461,7 @@
           title: feed.title,
           items: feed.items
         });
+        setTimeout(() => this.toggleSpinner(), 1000)
       },
 
       dateForHumans: function (date) {
@@ -451,6 +471,10 @@
       resetModal: function () {
         this.highlight = false;
         this.error = false;
+      },
+
+      toggleSpinner: function () {
+        this.spinner = !this.spinner;
       }
     },
     computed: {
