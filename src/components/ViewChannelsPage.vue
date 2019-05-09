@@ -15,6 +15,36 @@
         </div>
       </div>
     </header>
+    <main>
+      <div class="container max-w-md mx-auto px-2">
+        <div v-if="items.length === 0" class="h-full text-center mt-16">
+          <p class="font-bold text-3xl mb-5">Get started by adding some RSS feeds</p>
+          <div class="flex">
+            <div class="w-full">
+            </div>
+          </div>
+        </div>
+        <div v-else>
+          <h1 class="text-2xl mt-10 mb-5 text text-grey-darkest">Articles</h1>
+          <ol class="list-reset">
+            <li v-for="item in items" :key="item.key" class="mb-5">
+              <a :href="item.link" class="no-underline block bg-white p-4 shadow rounded max-w-sm" target="_blank">
+                <h4 class="mb-2 text-black">{{ item.title }}</h4>
+                <p class="text-grey-dark text-sm mb-4">{{item.contentSnippet.substring(0, 140)}}...</p>
+                <p class="text-grey-darker text-xs">
+                  <span v-if="item.creator">
+                    {{ item.creator }} &middot;
+                  </span>
+                  <span v-if="item.pubDate">
+                    {{ item.humanDate }}
+                  </span>
+                </p>
+              </a>
+            </li>
+          </ol>
+        </div>
+      </div>
+    </main>
     <section v-show="toggle" class="flex fixed pin bg-black-25 px-2">
       <div id="modal" class="container max-w-sm m-auto">
         <div class="bg-white px-6 md:px-12 py-10 rounded shadow-lg relative">
