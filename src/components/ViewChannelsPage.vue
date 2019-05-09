@@ -53,6 +53,9 @@
 </template>
 
 <script>
+  import Parser from "rss-parser";
+  import moment from "moment";
+
   export default {
     data() {
       return {
@@ -92,9 +95,57 @@
         }
       },
 
+      fetchFeed: function () {
+        let parser = new Parser();
+
+        parser
+          .parseURL(this.CORS_PROXY + this.feedUrl)
+          .then(feed => {
+            this.addFeed(feed);
+            this.toggleModal(feed);
+          })
+          .catch(error => {
+            if (error.message == "Status code 404") {
+              this.errorMessage = "Invalid URL";
+              this.error = true;
+            } else {
+              this.errorMessage = "Server error, please try again later!";
+              this.error = true;
+            }
+          });
+      },
+
+      addFeed: function (feed) {
+        this.feeds.push({
+          description: feed.description,
+          feedUrl: feed.feedUrl,
+          language: feed.language,
+          lastBuildDate: feed.lastBuildDate,
+          link: feed.link,
+          title: feed.title,
+          items: feed.items
+        });
+      },
+
+      dateForHumans: function (date) {
+        return moment(date).startOf('day').fromNow();
+      },
+
       resetModal: function () {
         this.highlight = false;
         this.error = false;
+      }
+    },
+    computed: {
+      items: function () {
+        return this.feeds
+          .map(feed => feed.items)
+          .flat()
+          .map((item, index) => (item.key = {
+            ...item,
+            key: index,
+            humanDate: this.dateForHumans(item.pubDate)
+          })).sort((a, b) => new Date(b.pubDate) - new Date(a.pubDate));
       }
     }
   };
